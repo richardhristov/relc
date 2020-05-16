@@ -24,7 +24,7 @@ docker-entrypoint-initdb.d/*.sql.gz
 
 # Data
 *.db
-data
+/data/
 sessions
 storage
 
