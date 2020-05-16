@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relc", "relc\relc.csproj", "{66972031-F896-4C38-B20E-7220EABA4EDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66972031-F896-4C38-B20E-7220EABA4EDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66972031-F896-4C38-B20E-7220EABA4EDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66972031-F896-4C38-B20E-7220EABA4EDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66972031-F896-4C38-B20E-7220EABA4EDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6A32B40-D467-4C1C-ADA5-955FAEE0F686}
+	EndGlobalSection
+EndGlobal
