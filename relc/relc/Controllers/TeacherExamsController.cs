@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using relc.Models;
 
 namespace relc.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/teacher/exams")]
     public class TeacherExamsController : ControllerBase
@@ -52,7 +54,7 @@ namespace relc.Controllers
 
             exam.IsActive = false;
             exam.IsEditable = true;
-            exam.ScoreMax = (short)exam.Questions.Sum(q => q.Score);
+            exam.ScoreMax = (short)exam.Questions.Where(q => q.IsOptional == false).Sum(q => q.Score);
             _context.Exams.Add(exam);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAsync), new { ExamId = exam.ExamId }, exam);
@@ -72,27 +74,24 @@ namespace relc.Controllers
                 return NotFound();
             }
 
-            if (existingExam.IsActive || !existingExam.IsEditable)
+            existingExam.IsActive = exam.IsActive;
+            if (existingExam.IsActive)
             {
-                return Unauthorized();
-            }
-
-            if (exam.IsEditable)
-            {
-                existingExam.IsActive = true;
                 existingExam.IsEditable = false;
             }
 
-            // TODO questions?
+            if (existingExam.IsEditable)
+            {
+                existingExam.Name = exam.Name;
+                existingExam.GradingScoreMax = exam.GradingScoreMax;
+                existingExam.GradingScoreMin = exam.GradingScoreMin;
+                existingExam.ScoreMax = exam.ScoreMax;
+                existingExam.RoundingMethod = exam.RoundingMethod;
+                existingExam.TimeLimitSeconds = exam.TimeLimitSeconds;
+                existingExam.Questions = exam.Questions;
+                existingExam.ScoreMax = (short)exam.Questions.Where(q => q.IsOptional == false).Sum(q => q.Score);
+            }
 
-            existingExam.Name = exam.Name;
-            existingExam.GradingScoreMax = exam.GradingScoreMax;
-            existingExam.GradingScoreMin = exam.GradingScoreMin;
-            existingExam.ScoreMax = exam.ScoreMax;
-            existingExam.RoundingMethod = exam.RoundingMethod;
-            existingExam.TimeLimitSeconds = exam.TimeLimitSeconds;
-            existingExam.Questions = exam.Questions;
-            existingExam.ScoreMax = (short)exam.Questions.Sum(q => q.Score);
             _context.Entry(existingExam).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 

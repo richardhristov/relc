@@ -43,8 +43,6 @@ namespace relc.Models
 
         public bool IsOptional { get; set; }
 
-        public bool AlwaysAppear { get; set; }
-
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
 
@@ -53,9 +51,9 @@ namespace relc.Models
         {
             get
             {
-                if (Type != QuestionType.SingleOption)
+                if (Type != QuestionType.SingleOption || string.IsNullOrEmpty(Options))
                 {
-                    throw new Exception("Question is not of the options type!");
+                    return null;
                 }
                 return JsonConvert.DeserializeObject<IList<string>>(Options);
             }
@@ -63,7 +61,7 @@ namespace relc.Models
             {
                 if (Type != QuestionType.SingleOption)
                 {
-                    throw new Exception("Question is not of the options type!");
+                    return;
                 }
                 Options = JsonConvert.SerializeObject(value);
             }

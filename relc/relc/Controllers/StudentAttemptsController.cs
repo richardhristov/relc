@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using relc.Models;
 
 namespace relc.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/student/attempts")]
     public class StudentAttemptsController : ControllerBase
@@ -69,8 +71,15 @@ namespace relc.Controllers
 
             short scorePossible = 0;
             short score = 0;
+            var questionIds = new List<int>();
             foreach (var item in attempt.Answers)
             {
+                if (questionIds.Contains(item.QuestionId))
+                {
+                    continue;
+                }
+                questionIds.Add(item.QuestionId);
+
                 var question = exam.Questions
                     .Where(q => q.QuestionId == item.QuestionId)
                     .FirstOrDefault();
@@ -78,7 +87,10 @@ namespace relc.Controllers
                 {
                     return BadRequest();
                 }
-                scorePossible += question.Score;
+                if (!question.IsOptional)
+                {
+                    scorePossible += question.Score;
+                }
                 item.Score = 0;
                 if (question.CheckAnswer(item.Answer))
                 {
