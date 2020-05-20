@@ -25,11 +25,20 @@ namespace relc.Controllers
             _logger = logger;
         }
 
+        public class Status
+        {
+            public string Message { get; set; }
+            public Status(string message)
+            {
+                Message = message;
+            }
+        }
+
         [HttpGet]
-        public IActionResult Get()
+        public ActionResult<object> Get()
         {
             _logger.LogDebug("GET /");
-            return NoContent();
+            return new Status("OK");
         }
     }
 }
