@@ -1,5 +1,5 @@
 {
-  "name": "relc-frontend-teacher",
+  "name": "relc-frontend-student",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,13 +13,15 @@
     "react-input-just-numbers": "1.0.3",
     "react-input-mask": "2.0.4",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "serve": "^11.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "serve": "serve -s build -l 3000"
   },
   "eslintConfig": {
     "extends": "react-app"
