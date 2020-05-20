@@ -46,7 +46,7 @@ class App extends Component {
     }
 
     const api = axios.create({
-      baseURL: `https://${config.domainApi}`,
+      baseURL: `http://${config.domainApi}`,
     });
     api.interceptors.request.use(config => {
       if (context.token) {
