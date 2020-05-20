@@ -1,7 +1,7 @@
 version: '2'
 services:
   relc:
-    build: ./relc
+    build: ./relc/relc
     restart: always
     depends_on:
       - database
