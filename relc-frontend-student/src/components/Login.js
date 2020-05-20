@@ -110,7 +110,7 @@ class Login extends Component {
         modifiers={this.props.modifiers}
       >
         <Heading
-          title="Teacher Login"
+          title="Student Login"
         >
           Please input your credentials to login.
         </Heading>
