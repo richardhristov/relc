@@ -12,13 +12,13 @@ services:
     build: ./relc-frontend-student
     restart: always
     ports:
-      - 3001:3001
+      - 4001:4001
 
   relc-frontend-teacher:
     build: ./relc-frontend-teacher
     restart: always
     ports:
-      - 3000:3000
+      - 4000:4000
 
   database:
     image: mysql:8
