@@ -57,12 +57,14 @@ namespace relc.Controllers
         [HttpGet]
         public async Task<IEnumerable<Login>> GetAllAsync()
         {
+            _logger.LogDebug("GET /logins");
             return await _context.Logins.ToListAsync();
         }
 
         [HttpGet("{LoginId}")]
         public async Task<Login> GetAsync(int LoginId)
         {
+            _logger.LogDebug("GET /logins/"+LoginId);
             return await _context.Logins
                 .Where(l => l.LoginId == LoginId)
                 .FirstOrDefaultAsync();
@@ -72,14 +74,17 @@ namespace relc.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult<AuthenticationResponse>> PostAuthenticateAsync(AuthenticateModel authenticateModel)
         {
+            _logger.LogDebug("POST /authenticate", authenticateModel);
             var login = await _context.Logins
                 .Where(l => l.Username == authenticateModel.Username)
                 .FirstOrDefaultAsync();
             if (login == null || !login.PasswordCompare(authenticateModel.Password))
             {
-                return NotFound();
+                _logger.LogDebug("Login credentials invalid", authenticateModel);
+                return NotFound("Username or password does not exist");
             }
 
+            _logger.LogDebug("Succesful login", authenticateModel);
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Secret"]);
             var tokenDescriptor = new SecurityTokenDescriptor

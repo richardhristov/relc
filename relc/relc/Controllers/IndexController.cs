@@ -28,6 +28,7 @@ namespace relc.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            _logger.LogDebug("GET /");
             return NoContent();
         }
     }

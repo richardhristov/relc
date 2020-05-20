@@ -11,7 +11,7 @@ using relc.Models;
 
 namespace relc.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "TeachersOnly")]
     [ApiController]
     [Route("/teacher/attempts")]
     public class TeacherAttemptsController : ControllerBase
@@ -30,6 +30,7 @@ namespace relc.Controllers
         [HttpGet]
         public async Task<IEnumerable<Attempt>> GetAllAsync()
         {
+            _logger.LogDebug("GET /teacher/attempts");
             return await _context.Attempts
                 .Include(e => e.Answers)
                 .Include(a => a.Exam)
@@ -41,6 +42,7 @@ namespace relc.Controllers
         [HttpGet("{AttemptId}")]
         public async Task<Attempt> GetAsync(int AttemptId)
         {
+            _logger.LogDebug("GET /teacher/attempts/"+AttemptId);
             return await _context.Attempts
                 .Include(e => e.Answers)
                 .Include(a => a.Exam)

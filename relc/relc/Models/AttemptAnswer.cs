@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,6 +13,7 @@ namespace relc.Models
         public int AttemptAnswerId { get; set; }
 
         public int AttemptId { get; set; }
+        [JsonIgnore]
         public Attempt Attempt { get; set; }
 
         public int QuestionId { get; set; }

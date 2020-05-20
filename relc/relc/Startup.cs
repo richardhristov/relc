@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
 using relc.Data;
+using relc.Models;
 
 namespace relc
 {
@@ -73,6 +75,12 @@ namespace relc
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("StudentsOnly", policy => policy.RequireClaim(ClaimTypes.Role, LoginType.Student.ToString()));
+                options.AddPolicy("TeachersOnly", policy => policy.RequireClaim(ClaimTypes.Role, LoginType.Teacher.ToString()));
             });
         }
 

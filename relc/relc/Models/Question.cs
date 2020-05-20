@@ -76,7 +76,7 @@ namespace relc.Models
 
                 case QuestionType.Int:
                 case QuestionType.SingleOption:
-                    return (int)answer == int.Parse(Answer);
+                    return int.Parse((string)answer) == int.Parse(Answer);
             }
             throw new NotImplementedException();
         }

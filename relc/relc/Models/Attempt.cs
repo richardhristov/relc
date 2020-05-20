@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,8 @@ namespace relc.Models
         public int LoginId { get; set; }
         public Login Login { get; set; }
 
+        [Required]
+        [Range(1, 43200)]
         public short TimeTaken { get; set; }
 
         public short Score { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ using relc.Models;
 
 namespace relc.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "StudentsOnly")]
     [ApiController]
     [Route("/student/attempts")]
     public class StudentAttemptsController : ControllerBase
@@ -30,7 +31,10 @@ namespace relc.Controllers
         [HttpGet]
         public async Task<IEnumerable<Attempt>> GetAllAsync()
         {
+            _logger.LogDebug("GET /students/attempts");
+            var loginId = int.Parse(User.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault().Value);
             return await _context.Attempts
+                .Where(a => a.LoginId == loginId)
                 .Include(e => e.Answers)
                 .Include(a => a.Exam)
                     .ThenInclude(e => e.Questions)
@@ -40,7 +44,10 @@ namespace relc.Controllers
         [HttpGet("{AttemptId}")]
         public async Task<Attempt> GetAsync(int AttemptId)
         {
+            _logger.LogDebug("GET /students/attempts/"+AttemptId);
+            var loginId = int.Parse(User.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault().Value);
             return await _context.Attempts
+                .Where(a => a.LoginId == loginId)
                 .Include(e => e.Answers)
                 .Include(a => a.Exam)
                     .ThenInclude(e => e.Questions)
@@ -49,8 +56,10 @@ namespace relc.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Exam>> PostAsync(Attempt attempt)
+        public async Task<ActionResult<Attempt>> PostAsync(Attempt attempt)
         {
+            _logger.LogDebug("POST /students/attempts", attempt);
+            var loginId = int.Parse(User.Claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault().Value);
             var exam = await _context.Exams
                 .Include(e => e.Questions)
                 .Where(e => e.ExamId == attempt.ExamId)
@@ -58,16 +67,19 @@ namespace relc.Controllers
 
             if (exam == null)
             {
-                return NotFound();
+                return NotFound("Exam was not found");
             }
 
             var oldAttempt = await _context.Attempts
                 .Where(a => a.ExamId == exam.ExamId)
+                .Where(a => a.LoginId == loginId)
                 .FirstOrDefaultAsync();
-            if (oldAttempt == null)
+            if (oldAttempt != null)
             {
-                return BadRequest();
+                return BadRequest("You already attempted this exam, you can only do one attempt");
             }
+
+            attempt.LoginId = loginId;
 
             short scorePossible = 0;
             short score = 0;
@@ -85,7 +97,7 @@ namespace relc.Controllers
                     .FirstOrDefault();
                 if (question == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Question not found");
                 }
                 if (!question.IsOptional)
                 {
@@ -101,7 +113,7 @@ namespace relc.Controllers
 
             if (scorePossible > exam.ScoreMax)
             {
-                return BadRequest();
+                return BadRequest("The computed score was invalid");
             }
 
             attempt.Score = score;
@@ -132,7 +144,7 @@ namespace relc.Controllers
                 case RoundingMethod.Up:
                     attempt.GradeRounded = (short)Math.Ceiling(attempt.Grade);
                     break;
-                    throw new NotImplementedException();
+                throw new NotImplementedException();
             }
 
             _context.Attempts.Add(attempt);

@@ -27,13 +27,13 @@ class Question extends Component {
   render() {
     let optionsList = null;
 
-    if (this.props.type == 2) {
+    if (this.props.type === 2) {
       optionsList = (
         <div>
           <ul className="list">
             {this.props.optionsList.map((o, index) => {
               return (
-                <li key={index}>
+                <li className="list__item" key={index}>
                   <Option
                     key={index}
                     visualKey={index}
@@ -56,7 +56,7 @@ class Question extends Component {
           maxLength="200"
           onChange={this.props.onChange.bind(this, 'name')}
         />
-        <select onChange={this.props.onChange.bind(this, 'type')}>
+        <select className="input__tag" onChange={this.props.onChange.bind(this, 'type')}>
           <option value={0}>Type: String</option>
           <option value={1}>Type: Int</option>
           <option value={2}>Type: Multiple choice, single answer</option>
@@ -105,7 +105,7 @@ class ExamWriter extends Component {
   async componentDidMount() {
     document.title = 'Create exam';
 
-    if (this.props.location && this.props.location.state && this.props.location.examId) {
+    if (this.props.location && this.props.location.state && this.props.location.state.examId) {
       await this.load(this.props.location.state.examId);
     }
 
@@ -231,17 +231,22 @@ class ExamWriter extends Component {
           {this.state.editing ? `Here you can edit an exam` : `Here you can create an exam`}
         </Heading>
 
-        <Input
-          label="Exam name"
-          value={this.state.exam.name}
-          maxLength="200"
-          onChange={this.valueChangedForExam.bind(this, 'name')}
-        />
+        <ul className="list list--dashed mt-1">
+          <li className="list__item">
+            <Input
+              label="Exam name"
+              value={this.state.exam.name}
+              maxLength="200"
+              onChange={this.valueChangedForExam.bind(this, 'name')}
+            />
+          </li>
 
-        <ul className="list">
           {this.state.exam.questions.map((q, index) => {
             return (
-              <li key={index}>
+              <li
+                className="list__item"
+                key={index}
+              >
                 <Question
                   key={index}
                   visualKey={index}
@@ -257,36 +262,55 @@ class ExamWriter extends Component {
               </li>
             );
           })}
+
+          <li className="list__item">
+            <Button onClick={this.addQuestionClicked.bind(this)}>Add question</Button>
+          </li>
+
+          <li className="list__item">
+            <Input
+              label="Time limit in seconds"
+              value={this.state.exam.timeLimitSeconds}
+              type="number"
+              onChange={this.valueChangedForExam.bind(this, 'timeLimitSeconds')}
+            />
+          </li>
+          
+          <li className="list__item">
+            <Input
+              label="Score for a minimum grade"
+              value={this.state.exam.gradingScoreMin}
+              type="number"
+              onChange={this.valueChangedForExam.bind(this, 'gradingScoreMin')}
+            />
+          </li>
+
+          <li className="list__item">
+            <Input
+              label="Score for a maximum grade"
+              value={this.state.exam.gradingScoreMax}
+              type="number"
+              onChange={this.valueChangedForExam.bind(this, 'gradingScoreMax')}
+            />
+          </li>
+
+          <li className="list__item">
+            Total possible score: {score}
+          </li>
+
+          <li className="list__item">
+            <select className="input__tag" onChange={this.valueChangedForExam.bind(this, 'roundingMethod')}>
+              <option value={0}>Rounding: Closest</option>
+              <option value={1}>Rounding: Up</option>
+              <option value={2}>Rounding: Down</option>
+            </select>
+          </li>
+
+          <li className="list__item">
+            <Button onClick={this.saveClicked.bind(this)}>Save</Button>
+            <Button href="/exams">Back to exams</Button>
+          </li>
         </ul>
-        <Button onClick={this.addQuestionClicked.bind(this)}>Add question</Button>
-
-        <Input
-          label="Time limit in seconds"
-          value={this.state.exam.timeLimitSeconds}
-          type="number"
-          onChange={this.valueChangedForExam.bind(this, 'timeLimitSeconds')}
-        />
-        <Input
-          label="Score for a minimum grade"
-          value={this.state.exam.gradingScoreMin}
-          type="number"
-          onChange={this.valueChangedForExam.bind(this, 'gradingScoreMin')}
-        />
-        <Input
-          label="Score for a maximum grade"
-          value={this.state.exam.gradingScoreMax}
-          type="number"
-          onChange={this.valueChangedForExam.bind(this, 'gradingScoreMax')}
-        />
-        Total possible score: {score}
-
-        <select onChange={this.valueChangedForExam.bind(this, 'roundingMethod')}>
-          <option value={0}>Rounding: Closest</option>
-          <option value={1}>Rounding: Up</option>
-          <option value={2}>Rounding: Down</option>
-        </select>
-        <Button href="/exams">Back</Button>
-        <Button onClick={this.saveClicked.bind(this)}>Save</Button>
       </Page>
     );
   }

@@ -11,7 +11,7 @@ import Context from './Context';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Exams from './components/Exams';
-import ExamWriter from './components/ExamWriter';
+import ExamTaker from './components/ExamTaker';
 import Attempts from './components/Attempts';
 
 function RouteAuth({ component: Component, ...rest }) {
@@ -58,8 +58,7 @@ class App extends Component {
       response => response,
       function (error) {
         // TODO better error handling
-        console.error(error);
-        //window.alert(error);
+        window.alert(error);
         return Promise.reject(error);
       }
     );
@@ -72,8 +71,7 @@ class App extends Component {
 
           <RouteAuth path="/dashboard" component={Dashboard} />
           <RouteAuth path="/exams" component={Exams} />
-          <RouteAuth path="/exams-create" component={ExamWriter} />
-          <RouteAuth path="/exams-edit" component={ExamWriter} />
+          <RouteAuth path="/exams-take" component={ExamTaker} />
           <RouteAuth path="/attempts" component={Attempts} />
         </Router>
       </Context.Provider>

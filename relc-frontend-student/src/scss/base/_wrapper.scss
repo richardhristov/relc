@@ -1,0 +1,44 @@
+.wrapper {
+  padding-left: unit(1/2);
+  padding-right: unit(1/2);
+
+  max-width: $breakpoint-md;
+  margin-left: auto;
+  margin-right: auto;
+
+  padding-top: unit(1);
+  padding-bottom: unit(1);
+
+  &--sm {
+    max-width: $breakpoint-sm;
+  }
+
+  display: flex;
+  flex-direction: column;
+
+  @media screen and(min-width: $breakpoint-sm) {
+    &--split-2to1,
+    &--split-1to2 {
+      display: grid;
+      grid-gap: unit(1/2) unit(1);
+    }
+
+    &--split-2to1 {
+      grid-template-columns: 66fr 34fr;
+    }
+
+    &--split-1to2 {
+      grid-template-columns: 34fr 64fr;
+    }
+  }
+
+  &__item {
+    > *:first-child {
+      margin-top: 0;
+    }
+
+    &--2 {
+      grid-column: 1 / 3;
+    }
+  }
+}

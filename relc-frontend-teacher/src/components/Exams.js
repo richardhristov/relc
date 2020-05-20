@@ -13,7 +13,7 @@ class ExamListItem extends Component {
   render() {
     return (
       <div className="exam">
-        {this.props.name}, status: {this.props.isActive ? 'active' : 'inactive'}
+        <b>{this.props.name}</b>, status: <b>{this.props.isActive ? 'active' : 'inactive'}</b>
       </div>
     );
   }
@@ -48,13 +48,13 @@ class Exams extends Component {
   }
 
   async deleteClicked(id) {
-    const response = await this.context.api.delete(`/teacher/exams/${id}`);
+    await this.context.api.delete(`/teacher/exams/${id}`);
 
     await this.load();
   }
 
   async activateClicked(id, exam) {
-    const response = await this.context.api.put(`/teacher/exams/${id}`, {
+    await this.context.api.put(`/teacher/exams/${id}`, {
       ...exam,
       isActive: true,
     });
@@ -63,7 +63,7 @@ class Exams extends Component {
   }
 
   async deactivateClicked(id, exam) {
-    const response = await this.context.api.put(`/teacher/exams/${id}`, {
+    await this.context.api.put(`/teacher/exams/${id}`, {
       ...exam,
       isActive: false,
     });
@@ -87,7 +87,10 @@ class Exams extends Component {
         <ul className="list">
           {this.state.exams.map((exam, index) => {
             return (
-              <li key={index}>
+              <li
+                className="list__item"
+                key={index}
+              >
                 <ExamListItem
                   key={index}
                   name={exam.name}
@@ -119,13 +122,27 @@ class Exams extends Component {
                 >
                   Deactivate
                 </Button>
+                <Button 
+                  to={{
+                    pathname: '/attempts',
+                    state: { examId: exam.examId }
+                  }}
+                >
+                  Show attempts
+                </Button>
               </li>
             );
           })}
         </ul>
 
-        <Button href="/exams-create">Create exam</Button>
-        <Button href="/dashboard">Back to dashboard</Button>
+        <ul className="list mt-1">
+          <li className="list__item">
+            <Button href="/exams-create">Create exam</Button>
+          </li>
+          <li className="list__item">
+          <Button href="/dashboard">Back to dashboard</Button>
+          </li>
+        </ul>
       </Page>
     );
   }

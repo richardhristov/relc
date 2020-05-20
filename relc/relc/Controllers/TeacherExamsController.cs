@@ -11,7 +11,7 @@ using relc.Models;
 
 namespace relc.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "TeachersOnly")]
     [ApiController]
     [Route("/teacher/exams")]
     public class TeacherExamsController : ControllerBase
@@ -30,7 +30,28 @@ namespace relc.Controllers
         [HttpGet]
         public async Task<IEnumerable<Exam>> GetAllAsync()
         {
+            _logger.LogDebug("GET /teacher/exams");
             return await _context.Exams
+                .Include(e => e.Questions)
+                .ToListAsync();
+        }
+
+        [HttpGet("active")]
+        public async Task<IEnumerable<Exam>> GetAllActiveAsync()
+        {
+            _logger.LogDebug("GET /teacher/exams/active");
+            return await _context.Exams
+                .Where(e => e.IsActive == true)
+                .Include(e => e.Questions)
+                .ToListAsync();
+        }
+
+        [HttpGet("inactive")]
+        public async Task<IEnumerable<Exam>> GetAllInactiveAsync()
+        {
+            _logger.LogDebug("GET /teacher/exams/inactive");
+            return await _context.Exams
+                .Where(e => e.IsActive == false)
                 .Include(e => e.Questions)
                 .ToListAsync();
         }
@@ -38,6 +59,7 @@ namespace relc.Controllers
         [HttpGet("{ExamId}")]
         public async Task<Exam> GetAsync(int ExamId)
         {
+            _logger.LogDebug("GET /teacher/exams/"+ExamId);
             return await _context.Exams
                 .Include(e => e.Questions)
                 .Where(e => e.ExamId == ExamId)
@@ -47,9 +69,10 @@ namespace relc.Controllers
         [HttpPost]
         public async Task<ActionResult<Exam>> PostAsync(Exam exam)
         {
+            _logger.LogDebug("POST /teacher/exams"+exam);
             if (exam.Questions.Count < 1)
             {
-                return BadRequest();
+                return BadRequest("Exam did not have any questions");
             }
 
             exam.IsActive = false;
@@ -63,15 +86,21 @@ namespace relc.Controllers
         [HttpPut("{ExamId}")]
         public async Task<ActionResult> PutAsync(int ExamId, Exam exam)
         {
-            if (ExamId != exam.ExamId || exam.Questions.Count < 1)
+            _logger.LogDebug("PUT /teacher/exams" + exam);
+            if (exam.Questions.Count < 1)
             {
-                return BadRequest();
+                return BadRequest("Exam did not have any questions");
+            }
+
+            if (ExamId != exam.ExamId)
+            {
+                return BadRequest("Exam id was invalid");
             }
 
             var existingExam = await _context.Exams.FindAsync(ExamId);
             if (existingExam == null)
             {
-                return NotFound();
+                return NotFound("Existing exam not found");
             }
 
             existingExam.IsActive = exam.IsActive;
@@ -101,15 +130,17 @@ namespace relc.Controllers
         [HttpDelete("{ExamId}")]
         public async Task<ActionResult<Exam>> DeleteAsync(int ExamId)
         {
+            _logger.LogDebug("DELETE /teacher/exams" + ExamId);
+
             var existingExam = await _context.Exams.FindAsync(ExamId);
             if (existingExam == null)
             {
-                return NotFound();
+                return NotFound("Existing exam not found");
             }
 
             if (existingExam.IsActive || !existingExam.IsEditable)
             {
-                return Unauthorized();
+                return BadRequest("Exam is not deleteable");
             }
 
             _context.Exams.Remove(existingExam);
