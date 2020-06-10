@@ -56,7 +56,7 @@ namespace relc.Controllers
                 .ToListAsync();
         }
 
-        [HttpGet("{ExamId}", Name = nameof(GetAsync))]
+        [HttpGet("{ExamId}", Name = nameof(TeacherExamsController) + nameof(GetAsync))]
         public async Task<Exam> GetAsync(int ExamId)
         {
             _logger.LogDebug("GET /teacher/exams/"+ExamId);
@@ -80,7 +80,7 @@ namespace relc.Controllers
             exam.ScoreMax = (short)exam.Questions.Where(q => q.IsOptional == false).Sum(q => q.Score);
             _context.Exams.Add(exam);
             await _context.SaveChangesAsync();
-            return CreatedAtRoute(nameof(GetAsync), new { ExamId = exam.ExamId }, exam);
+            return CreatedAtRoute(nameof(TeacherExamsController) + nameof(GetAsync), new { ExamId = exam.ExamId }, exam);
         }
 
         [HttpPut("{ExamId}")]

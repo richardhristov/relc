@@ -41,7 +41,7 @@ namespace relc.Controllers
                 .ToListAsync();
         }
 
-        [HttpGet("{AttemptId}", Name = nameof(GetAsync))]
+        [HttpGet("{AttemptId}", Name = nameof(StudentAttemptsController) + nameof(GetAsync))]
         public async Task<Attempt> GetAsync(int AttemptId)
         {
             _logger.LogDebug("GET /students/attempts/"+AttemptId);
@@ -149,7 +149,7 @@ namespace relc.Controllers
 
             _context.Attempts.Add(attempt);
             await _context.SaveChangesAsync();
-            return CreatedAtRoute(nameof(GetAsync), new { AttemptId = attempt.AttemptId }, attempt);
+            return CreatedAtRoute(nameof(StudentAttemptsController) + nameof(GetAsync), new { AttemptId = attempt.AttemptId }, attempt);
         }
     }
 }
