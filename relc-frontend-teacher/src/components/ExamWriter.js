@@ -87,6 +87,7 @@ class ExamWriter extends Component {
     this.state = {
       redirect: false,
       loading: true,
+      error: null,
       editing: false,
       exam: {
         examId: undefined,
@@ -185,23 +186,143 @@ class ExamWriter extends Component {
 
     this.setState({
       ...this.state,
+      error: null,
       loading: true,
     });
 
-
-    let response = null;
-    if (this.state.editing) {
-      response = await this.context.api.put(`/teacher/exams/${this.state.exam.examId}`, {
-        ...this.state.exam,
-        scoreMax: this.getScore(),
+    if (this.state.exam.name.length < 3) {
+      this.setState({
+        ...this.state,
+        error: 'The name cannot be shorter than 3 characters.',
+        loading: false,
       });
-    } else {
-      response = await this.context.api.post(`/teacher/exams`, {
-        ...this.state.exam,
-        scoreMax: this.getScore(),
-      });
+      return;
     }
-    // TODO show error
+
+
+    if (isNaN(parseInt(this.state.exam.timeLimitSeconds))) {
+      this.setState({
+        ...this.state,
+        error: 'The time limit must be an integer.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (isNaN(parseInt(this.state.exam.gradingScoreMin))) {
+      this.setState({
+        ...this.state,
+        error: 'The min grading score must be an integer.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (isNaN(parseInt(this.state.exam.gradingScoreMax))) {
+      this.setState({
+        ...this.state,
+        error: 'The max grading score must be an integer.',
+        loading: false,
+      });
+      return;
+    }
+
+
+    if (parseInt(this.state.exam.timeLimitSeconds) <= 0) {
+      this.setState({
+        ...this.state,
+        error: 'The time limit must be greater than 0.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (parseInt(this.state.exam.gradingScoreMin) <= 0) {
+      this.setState({
+        ...this.state,
+        error: 'The min grading score must be greater than 0.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (parseInt(this.state.exam.gradingScoreMax) <= 0) {
+      this.setState({
+        ...this.state,
+        error: 'The max grading score must be greater than 0.',
+        loading: false,
+      });
+      return;
+    }
+
+
+    if (this.state.exam.questions.length <= 0) {
+      this.setState({
+        ...this.state,
+        error: 'There must be at least one question in the test.',
+        loading: false,
+      });
+      return;
+    }
+
+
+    if (this.state.exam.questions.filter(q => q.name.length < 3).length > 0) {
+      this.setState({
+        ...this.state,
+        error: 'All questions must have a name longer than 2 characters.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (this.state.exam.questions.filter(q => isNaN(parseInt(q.score))).length > 0) {
+      this.setState({
+        ...this.state,
+        error: 'All questions must have integer scores.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (this.state.exam.questions.filter(q => parseInt(q.score) <= 0).length > 0) {
+      this.setState({
+        ...this.state,
+        error: 'All questions must have integer scores greater than 0.',
+        loading: false,
+      });
+      return;
+    }
+
+    if (this.state.exam.questions.filter(q => q.answer.length <= 0).length > 0) {
+      this.setState({
+        ...this.state,
+        error: 'All questions must have answers',
+        loading: false,
+      });
+      return;
+    }
+
+    try {
+      let response = null;
+      if (this.state.editing) {
+        response = await this.context.api.put(`/teacher/exams/${this.state.exam.examId}`, {
+          ...this.state.exam,
+          scoreMax: this.getScore(),
+        });
+      } else {
+        response = await this.context.api.post(`/teacher/exams`, {
+          ...this.state.exam,
+          scoreMax: this.getScore(),
+        });
+      }
+    } catch(err) {
+      this.setState({
+        ...this.state,
+        error: 'There was an error, please try again.',
+        loading: false,
+      });
+      return;
+    }
 
     this.setState({
       ...this.state,
@@ -223,6 +344,15 @@ class ExamWriter extends Component {
 
     const score = this.getScore();
 
+    let error = null;
+    if (this.state.error) {
+      error = (
+        <li className="list__item error">
+          {this.state.error}
+        </li>
+      );
+    }
+
     return (
       <Page>
         <Heading
@@ -232,6 +362,7 @@ class ExamWriter extends Component {
         </Heading>
 
         <ul className="list list--dashed mt-1">
+          {error}
           <li className="list__item">
             <Input
               label="Exam name"
